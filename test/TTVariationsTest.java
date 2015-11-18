@@ -32,7 +32,7 @@ import static org.junit.Assert.*;
  *
  * @author Pierre-Yves Lajoie
  * @creationDate    November 14th 2015
- * @lastUpdate      November 17th 2015
+ * @lastUpdate      November 18th 2015
  */
 public class TTVariationsTest {
     //Tests
@@ -205,7 +205,63 @@ public class TTVariationsTest {
     }
     
     @Test
-    public final void testComputeBusyPeriod_DL2_f12_TT3(){
+    public final void testComputeBusyPeriod_DL1_f12_TT1_TT2_1(){
+        //Node of dl1
+        EndSystem ES1 = new EndSystem("ES1");
+        NetworkNode NS1 = new NetworkNode("NS1");
+        //DataLink and DataPath
+        DataLink dl1 = new DataLink(ES1, NS1,1);
+        DataPath dp12 = new DataPath();
+        
+        //Schedule of TT frames
+        //Swap the 2 TT frames
+        TTFrame tt2 = new TTFrame(2,2.5,3,32);
+        dl1.getTT_schedule().getFramesList().add(tt2);
+        TTFrame tt1 = new TTFrame(1,3,9,32);
+        dl1.getTT_schedule().getFramesList().add(tt1);
+         //Schedule of RC frames
+        RCFrame rc1 = new RCFrame(10,1.5,1,32);
+        dl1.getRC_schedule().getFramesList().add(rc1);
+        RCFrame rc2 = new RCFrame(11,2.5,1,32);
+        dl1.getRC_schedule().getFramesList().add(rc2);
+        //Frame 12
+        dp12.getDataLinksQueue().add(dl1);
+        RCFrame f12 = new RCFrame(12,2,1,32,dp12);
+        dl1.getRC_schedule().getFramesList().add(f12);
+        double busyPeriod = f12.computeBusyPeriod(dl1);
+        assertTrue("Wrong result, calculated BusyPeriod for dl1 = "+ busyPeriod +"ms, expected: 17ms",(busyPeriod == 17));
+    }
+    
+    @Test
+    public final void testComputeBusyPeriod_DL1_f12_TT1_TT2_2(){
+        //Node of dl1
+        EndSystem ES1 = new EndSystem("ES1");
+        NetworkNode NS1 = new NetworkNode("NS1");
+        //DataLink and DataPath
+        DataLink dl1 = new DataLink(ES1, NS1,1);
+        DataPath dp12 = new DataPath();
+        
+        //Schedule of TT frames
+        //The 2 TTs are shift by 2
+        TTFrame tt1 = new TTFrame(1,3,5,32);
+        dl1.getTT_schedule().getFramesList().add(tt1);
+        TTFrame tt2 = new TTFrame(2,2.5,11,32);
+        dl1.getTT_schedule().getFramesList().add(tt2);
+         //Schedule of RC frames
+        RCFrame rc1 = new RCFrame(10,1.5,1,32);
+        dl1.getRC_schedule().getFramesList().add(rc1);
+        RCFrame rc2 = new RCFrame(11,2.5,1,32);
+        dl1.getRC_schedule().getFramesList().add(rc2);
+        //Frame 12
+        dp12.getDataLinksQueue().add(dl1);
+        RCFrame f12 = new RCFrame(12,2,1,32,dp12);
+        dl1.getRC_schedule().getFramesList().add(f12);
+        double busyPeriod = f12.computeBusyPeriod(dl1);
+        assertTrue("Wrong result, calculated BusyPeriod for dl1 = "+ busyPeriod +"ms, expected: 17ms",(busyPeriod == 17));
+    }
+    
+    @Test
+    public final void testComputeBusyPeriod_DL2_f12_TT3_1(){
         //Node of dl2
         NetworkNode NS1 = new NetworkNode("NS1");
         NetworkNode NS2 = new NetworkNode("NS2"); 
@@ -220,21 +276,22 @@ public class TTVariationsTest {
         TTFrame tt3 = new TTFrame(3,3.5,15,32);
         dl2.getTT_schedule().getFramesList().add(tt3);
          //Schedule of RC frames
-        RCFrame rc3 = new RCFrame(13,2,16,32);
+        RCFrame rc3 = new RCFrame(13,2,13.5,32);
         dl2.getRC_schedule().getFramesList().add(rc3);
-        RCFrame rc4 = new RCFrame(14,1.5,18,32);
+        RCFrame rc4 = new RCFrame(14,1.5,13.5,32);
         dl2.getRC_schedule().getFramesList().add(rc4);
-        RCFrame rc5 = new RCFrame(10,1.5,19.5,32);
+        RCFrame rc5 = new RCFrame(10,1.5,13.5,32);
         dl2.getRC_schedule().getFramesList().add(rc5);
-        RCFrame rc6 = new RCFrame(11,2.5,21,32);
+        RCFrame rc6 = new RCFrame(11,2.5,13.5,32);
         dl2.getRC_schedule().getFramesList().add(rc6);
         //Frame 12
         dp12.getDataLinksQueue().add(dl2);
-        RCFrame f12 = new RCFrame(12,2,17.5,32,dp12);
+        RCFrame f12 = new RCFrame(12,2,13.5,32,dp12);
         dl2.getRC_schedule().getFramesList().add(f12);
         double busyPeriod = f12.computeBusyPeriod(dl2);
-        assertTrue("Wrong result, calculated BusyPeriod for dl2 = "+ busyPeriod +"ms, expected: 10.5ms",(busyPeriod == 10.5));
+        assertTrue("Wrong result, calculated BusyPeriod for dl2 = "+ busyPeriod +"ms, expected: 14.5ms",(busyPeriod == 14.5));
     }
+    
     
     @Test
     public final void testComputeBusyPeriod_DL6_f12_TT1(){
@@ -254,9 +311,9 @@ public class TTVariationsTest {
         dl6.getRC_schedule().getFramesList().add(rc7);
         //Frame 12
         dp12.getDataLinksQueue().add(dl6);
-        RCFrame f12 = new RCFrame(12,2,25.5,32,dp12);
+        RCFrame f12 = new RCFrame(12,2,23.5,32,dp12);
         dl6.getRC_schedule().getFramesList().add(f12);
         double busyPeriod = f12.computeBusyPeriod(dl6);
-        assertTrue("Wrong result, calculated BusyPeriod for dl6 = "+ busyPeriod +"ms, expected: 3.5ms",(busyPeriod == 3.5));
+        assertTrue("Wrong result, calculated BusyPeriod for dl6 = "+ busyPeriod +"ms, expected: 5.5ms",(busyPeriod == 5.5));
     }
 }

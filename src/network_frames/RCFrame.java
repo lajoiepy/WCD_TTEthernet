@@ -22,7 +22,7 @@ import network_components.DataLink;
  *
  * @author Pierre-Yves Lajoie
  * @creationDate    October 7th 2015
- * @lastUpdate      November 17th 2015
+ * @lastUpdate      November 18th 2015
  * 
  */
 public class RCFrame implements Frame{
@@ -141,7 +141,8 @@ public class RCFrame implements Frame{
             
             //compute of availibility
             availibility = busyPeriod - (Qtt + Qtb + Qtl);
-            
+            //System.out.print("Qtt : "+ Qtt +"\n");//test
+            //System.out.print("Qtb : "+ Qtb +"\n");//test
             return availibility;
     }
     
@@ -152,13 +153,13 @@ public class RCFrame implements Frame{
                 //if the TT frame is totally between tc and tc+busyPeriod
                 if(frame.getOffset()>= offset && frame.getOffset()+frame.getC() <= offset+busyPeriod)
                     Qtt += frame.getC();
-                //if the TT begin but not finish in the time interval
+                //if the TT begins but not finish in the time interval
                 else if(frame.getOffset()>= offset && frame.getOffset() <= offset+busyPeriod && frame.getOffset() + frame.getC()>offset+busyPeriod) 
                     Qtt += offset + busyPeriod - frame.getOffset();
-                //if the TT start before the time interval and finish during it.
+                //if the TT starts before the time interval and finish during it.
                 else if(frame.getOffset() < offset && frame.getOffset()+frame.getC() <= offset+busyPeriod && frame.getOffset()+frame.getC() > offset) 
-                    Qtt += frame.getOffset() - offset;
-                //if the TT cover totally the time interval.
+                    Qtt += frame.getOffset() + frame.getC() - offset;
+                //if the TT covers totally the time interval.
                 else if(frame.getOffset() < offset && frame.getOffset()+frame.getC() > offset+busyPeriod)  
                     Qtt += busyPeriod;
             }
@@ -190,7 +191,7 @@ public class RCFrame implements Frame{
             double Qtb = 0;
             //Selection of the largest C and save the value of the smallest Camong the RC frames
             double largestC, smallestC;
-            boolean isTooSmall = false;
+            boolean isTooSmall = false;//TODO: can it happen  just once?
             double tooSmallGap = 0;
             //to see if there a too small gap for RC to pass. We use it for the availibility.
             if (!dlj.getTT_schedule().getFramesList().isEmpty()){
@@ -215,10 +216,19 @@ public class RCFrame implements Frame{
                     }
                     //if the time block is totally between tc and tc+busyPeriod and is smaller than the gap between the 2 TT frames
                     else if(frame.getOffset()>= offset+largestC && frame.getOffset()<= offset+busyPeriod && largestC<= timeBetween2TTFrames){
-                        
-                        if(timeBetween2TTFrames-largestC < smallestC){
-                            isTooSmall = true;
-                            tooSmallGap += timeBetween2TTFrames-largestC;
+                        //if there is not enough time to pass a RCFrame. 
+                        //Verification that there is a big enough continous availibility to pass frame.
+                        double rcSatisfaction =0;
+                        for(Frame rc : dlj.getRC_schedule().getFramesList()){//TODO: Reduce complexity if possible
+                            if(!isTooSmall){
+                                if(timeBetween2TTFrames-largestC-rcSatisfaction >= rc.getC()){
+                                    rcSatisfaction += rc.getC();
+                                }
+                                else{
+                                    tooSmallGap += timeBetween2TTFrames-largestC - rcSatisfaction;
+                                    isTooSmall = true;
+                                }
+                            }
                         }
                         timeBlockByTT += largestC;
                     }
@@ -230,11 +240,19 @@ public class RCFrame implements Frame{
                     }
                     //if the TT starts outside of the time interval but has an impact in the time blocking.
                     else if(frame.getOffset() > offset + busyPeriod && frame.getOffset()-largestC < offset+busyPeriod){
-                        
-                        
-                        if(frame.getOffset()-largestC-(previousTTFrame.getOffset()+previousTTFrame.getC()) < smallestC){
-                            isTooSmall = true;
-                            tooSmallGap += offset+busyPeriod - (previousTTFrame.getOffset()+previousTTFrame.getC()) - (offset+busyPeriod - (frame.getOffset()-largestC));
+                        //if there is not enough time to pass a RCFrame. 
+                        //Verification that there is a big enough continous availibility to pass frame.
+                        double rcSatisfaction = 0;
+                        for(Frame rc : dlj.getRC_schedule().getFramesList()){//TODO: Reduce complexity if possible
+                            if(!isTooSmall){
+                                if(timeBetween2TTFrames-largestC-rcSatisfaction >= rc.getC()){
+                                    rcSatisfaction += rc.getC();
+                                }
+                                else{
+                                    tooSmallGap += timeBetween2TTFrames-largestC - rcSatisfaction;
+                                    isTooSmall = true;
+                                }
+                            }
                         }
                         timeBlockByTT += offset+busyPeriod - (frame.getOffset()-largestC);
                     }
@@ -272,33 +290,26 @@ public class RCFrame implements Frame{
         double demand;
         double availibility;
         do{
-            
+            //System.out.print("FrameID : "+ id + " DLID : "+dlj.getID()+"\n");//test
             /*
                 Compute demand Hxj(bpxj)
             */
             demand = computeDemand(dlj, busyPeriod);
-            
+            //System.out.print("Demand : "+ demand +"\n");//test
             /* 
                 Compute availability Axj(bpxj)
             */
             availibility = computeAvailibility(dlj, busyPeriod);
-            
+            //System.out.print("Availibility : "+ availibility+"\n");//test
             if(demand > availibility)
                 tj = tj+ demand - availibility;
             
             //Update the busyPeriod
             busyPeriod = tj - offset;
             //Infomation
-            /*System.out.print("FrameID : "+ id + " DLID : "+dlj.getID()+"\n");
-            System.out.print("Demand : "+ demand +"\n");
-            System.out.print("Qtt : "+ Qtt +"\n");//test
-            System.out.print("smallestC : "+ smallestC +"\n");//test
-            System.out.print("largestC : "+ largestC +"\n");//test
-            System.out.print("Qtb : "+ Qtb +"\n");//test
-            System.out.print("Availibility : "+ availibility+"\n");//test
-            System.out.print("Tj : "+ tj+"\n");//test
-            System.out.print("offset : "+ offset +"\n");//test
-            System.out.print("BusyPeriod : "+ busyPeriod +"\n\n");//test*/
+            //System.out.print("Tj : "+ tj+"\n");//test
+            //System.out.print("offset : "+ offset +"\n");//test
+            //System.out.print("BusyPeriod : "+ busyPeriod +"\n\n");//test
         }while(availibility < demand);
         
         return busyPeriod;
@@ -307,7 +318,7 @@ public class RCFrame implements Frame{
     public double computeDelayOnFrame(){
         double busyPeriod = 0;
         double delay = 0;
-            System.out.print("Frame "+id+" : "); //test
+            //System.out.print("Frame "+id+" : "); //test
             for(DataLink dlj: dp.getDataLinksQueue()){
                 
                 /*
@@ -339,15 +350,15 @@ public class RCFrame implements Frame{
                 offset = offset + busyPeriod - c;
 
                 //info
-                System.out.print(offset);//test
+                /*System.out.print(offset);//test
                 System.out.print("|--");//test
                 System.out.print(dlj.getID()); //test
                 System.out.print("--|");//test
-                System.out.print(tj+"       ");//test
+                System.out.print(tj+"       ");//test*/
                 //System.out.print("BP: "+busyPeriod+"   "); //test
                 
             }
-            System.out.print("\n\n");//test
+            //System.out.print("\n\n");//test
             
             delay = tj-t0;
             
