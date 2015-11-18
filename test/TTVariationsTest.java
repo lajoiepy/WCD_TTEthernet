@@ -37,7 +37,7 @@ import static org.junit.Assert.*;
 public class TTVariationsTest {
     //Tests
     @Test
-    public final void testComputeBusyPeriod_DL1_f12_TT1(){
+    public final void testComputeBusyPeriod_DL1_f12_TT1_1(){
         //Node of dl1
         EndSystem ES1 = new EndSystem("ES1");
         NetworkNode NS1 = new NetworkNode("NS1");
@@ -65,6 +65,146 @@ public class TTVariationsTest {
     }
     
     @Test
+    public final void testComputeBusyPeriod_DL1_f12_TT1_2(){
+        //Node of dl1
+        EndSystem ES1 = new EndSystem("ES1");
+        NetworkNode NS1 = new NetworkNode("NS1");
+        //DataLink and DataPath
+        DataLink dl1 = new DataLink(ES1, NS1,1);
+        DataPath dp12 = new DataPath();
+        
+        //Schedule of TT frames
+        //TT1 moved to 6ms, so the f10 goes before TT1 and TT2.
+        TTFrame tt1 = new TTFrame(1,3,6,32);
+        dl1.getTT_schedule().getFramesList().add(tt1);
+        TTFrame tt2 = new TTFrame(2,2.5,9,32);
+        dl1.getTT_schedule().getFramesList().add(tt2);
+         //Schedule of RC frames
+        RCFrame rc1 = new RCFrame(10,1.5,1,32);
+        dl1.getRC_schedule().getFramesList().add(rc1);
+        RCFrame rc2 = new RCFrame(11,2.5,1,32);
+        dl1.getRC_schedule().getFramesList().add(rc2);
+        //Frame 12
+        dp12.getDataLinksQueue().add(dl1);
+        RCFrame f12 = new RCFrame(12,2,1,32,dp12);
+        dl1.getRC_schedule().getFramesList().add(f12);
+        double busyPeriod = f12.computeBusyPeriod(dl1);
+        assertTrue("Wrong result, calculated BusyPeriod for dl1 = "+ busyPeriod +"ms, expected: 14ms",(busyPeriod == 14));
+    }
+    
+    @Test
+    public final void testComputeBusyPeriod_DL1_f12_TT2_1(){
+        //Node of dl1
+        EndSystem ES1 = new EndSystem("ES1");
+        NetworkNode NS1 = new NetworkNode("NS1");
+        //DataLink and DataPath
+        DataLink dl1 = new DataLink(ES1, NS1,1);
+        DataPath dp12 = new DataPath();
+        
+        //Schedule of TT frames
+        TTFrame tt1 = new TTFrame(1,3,3,32);
+        dl1.getTT_schedule().getFramesList().add(tt1);
+        //TT2 moved to 10ms, so the f10 goes between TT1 and TT2.
+        TTFrame tt2 = new TTFrame(2,2.5,10,32);
+        dl1.getTT_schedule().getFramesList().add(tt2);
+         //Schedule of RC frames
+        RCFrame rc1 = new RCFrame(10,1.5,1,32);
+        dl1.getRC_schedule().getFramesList().add(rc1);
+        RCFrame rc2 = new RCFrame(11,2.5,1,32);
+        dl1.getRC_schedule().getFramesList().add(rc2);
+        //Frame 12
+        dp12.getDataLinksQueue().add(dl1);
+        RCFrame f12 = new RCFrame(12,2,1,32,dp12);
+        dl1.getRC_schedule().getFramesList().add(f12);
+        double busyPeriod = f12.computeBusyPeriod(dl1);
+        assertTrue("Wrong result, calculated BusyPeriod for dl1 = "+ busyPeriod +"ms, expected: 16ms",(busyPeriod == 16));
+    }
+    
+    @Test
+    public final void testComputeBusyPeriod_DL1_f12_TT2_2(){
+        //Node of dl1
+        EndSystem ES1 = new EndSystem("ES1");
+        NetworkNode NS1 = new NetworkNode("NS1");
+        //DataLink and DataPath
+        DataLink dl1 = new DataLink(ES1, NS1,1);
+        DataPath dp12 = new DataPath();
+        
+        //Schedule of TT frames
+        TTFrame tt1 = new TTFrame(1,3,3,32);
+        dl1.getTT_schedule().getFramesList().add(tt1);
+        //TT2 moved to 12.5ms, so f10 and f11 goes between TT1 and TT2.
+        TTFrame tt2 = new TTFrame(2,2.5,12.5,32);
+        dl1.getTT_schedule().getFramesList().add(tt2);
+         //Schedule of RC frames
+        RCFrame rc1 = new RCFrame(10,1.5,1,32);
+        dl1.getRC_schedule().getFramesList().add(rc1);
+        RCFrame rc2 = new RCFrame(11,2.5,1,32);
+        dl1.getRC_schedule().getFramesList().add(rc2);
+        //Frame 12
+        dp12.getDataLinksQueue().add(dl1);
+        RCFrame f12 = new RCFrame(12,2,1,32,dp12);
+        dl1.getRC_schedule().getFramesList().add(f12);
+        double busyPeriod = f12.computeBusyPeriod(dl1);
+        assertTrue("Wrong result, calculated BusyPeriod for dl1 = "+ busyPeriod +"ms, expected: 16ms",(busyPeriod == 16));
+    }
+    
+    @Test
+    public final void testComputeBusyPeriod_DL1_f12_TT2_3(){
+        //Node of dl1
+        EndSystem ES1 = new EndSystem("ES1");
+        NetworkNode NS1 = new NetworkNode("NS1");
+        //DataLink and DataPath
+        DataLink dl1 = new DataLink(ES1, NS1,1);
+        DataPath dp12 = new DataPath();
+        
+        //Schedule of TT frames
+        TTFrame tt1 = new TTFrame(1,3,3,32);
+        dl1.getTT_schedule().getFramesList().add(tt1);
+        //TT2 moved to 20ms, so f10, f11 and f12 goes between TT1 and TT2.
+        TTFrame tt2 = new TTFrame(2,2.5,20,32);
+        dl1.getTT_schedule().getFramesList().add(tt2);
+         //Schedule of RC frames
+        RCFrame rc1 = new RCFrame(10,1.5,1,32);
+        dl1.getRC_schedule().getFramesList().add(rc1);
+        RCFrame rc2 = new RCFrame(11,2.5,1,32);
+        dl1.getRC_schedule().getFramesList().add(rc2);
+        //Frame 12
+        dp12.getDataLinksQueue().add(dl1);
+        RCFrame f12 = new RCFrame(12,2,1,32,dp12);
+        dl1.getRC_schedule().getFramesList().add(f12);
+        double busyPeriod = f12.computeBusyPeriod(dl1);
+        assertTrue("Wrong result, calculated BusyPeriod for dl1 = "+ busyPeriod +"ms, expected: 11ms",(busyPeriod == 11));
+    }
+    
+    @Test
+    public final void testComputeBusyPeriod_DL1_f12_TT2_4(){
+        //Node of dl1
+        EndSystem ES1 = new EndSystem("ES1");
+        NetworkNode NS1 = new NetworkNode("NS1");
+        //DataLink and DataPath
+        DataLink dl1 = new DataLink(ES1, NS1,1);
+        DataPath dp12 = new DataPath();
+        
+        //Schedule of TT frames
+        TTFrame tt1 = new TTFrame(1,3,3,32);
+        dl1.getTT_schedule().getFramesList().add(tt1);
+        //TT2 moved to 14ms, so f10, f11 and f12 goes between TT1 and TT2.
+        TTFrame tt2 = new TTFrame(2,2.5,14,32);
+        dl1.getTT_schedule().getFramesList().add(tt2);
+         //Schedule of RC frames
+        RCFrame rc1 = new RCFrame(10,1.5,1,32);
+        dl1.getRC_schedule().getFramesList().add(rc1);
+        RCFrame rc2 = new RCFrame(11,2.5,1,32);
+        dl1.getRC_schedule().getFramesList().add(rc2);
+        //Frame 12
+        dp12.getDataLinksQueue().add(dl1);
+        RCFrame f12 = new RCFrame(12,2,1,32,dp12);
+        dl1.getRC_schedule().getFramesList().add(f12);
+        double busyPeriod = f12.computeBusyPeriod(dl1);
+        assertTrue("Wrong result, calculated BusyPeriod for dl1 = "+ busyPeriod +"ms, expected: 17.5ms",(busyPeriod == 17.5));
+    }
+    
+    @Test
     public final void testComputeBusyPeriod_DL2_f12_TT3(){
         //Node of dl2
         NetworkNode NS1 = new NetworkNode("NS1");
@@ -77,7 +217,7 @@ public class TTVariationsTest {
         TTFrame tt2 = new TTFrame(1,3,7,32);
         dl2.getTT_schedule().getFramesList().add(tt2);
         //TT3 moved to 15
-        TTFrame tt3 = new TTFrame(3,3.5,12.5,32);
+        TTFrame tt3 = new TTFrame(3,3.5,15,32);
         dl2.getTT_schedule().getFramesList().add(tt3);
          //Schedule of RC frames
         RCFrame rc3 = new RCFrame(13,2,16,32);
@@ -95,6 +235,7 @@ public class TTVariationsTest {
         double busyPeriod = f12.computeBusyPeriod(dl2);
         assertTrue("Wrong result, calculated BusyPeriod for dl2 = "+ busyPeriod +"ms, expected: 10.5ms",(busyPeriod == 10.5));
     }
+    
     @Test
     public final void testComputeBusyPeriod_DL6_f12_TT1(){
         //Node of dl6
@@ -106,7 +247,7 @@ public class TTVariationsTest {
         
         //Schedule of TT frames
         //TT1 moved to 22ms, so the frames are push back later
-        TTFrame tt1 = new TTFrame(1,3,11,32);
+        TTFrame tt1 = new TTFrame(1,3,22,32);
         dl6.getTT_schedule().getFramesList().add(tt1);
          //Schedule of RC frames
         RCFrame rc7 = new RCFrame(13,2,23.5,32);
