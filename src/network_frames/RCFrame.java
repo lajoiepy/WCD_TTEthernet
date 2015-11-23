@@ -22,10 +22,10 @@ import network_components.DataLink;
  *
  * @author Pierre-Yves Lajoie
  * @creationDate    October 7th 2015
- * @lastUpdate      November 18th 2015
+ * @lastUpdate      November 22th 2015
  * 
  */
-public class RCFrame implements Frame{
+public class RCFrame implements Frame, Comparable<RCFrame>{
         
     /*Constructors*/
     public RCFrame(int ID, double C, double Offset, double Rate, DataPath DP){
@@ -93,6 +93,19 @@ public class RCFrame implements Frame{
     public final double getRate(){
         return rate;
     }
+    
+    @Override
+    public int compareTo(RCFrame f) {
+		double comparedC = f.getC();
+		if (this.getC() > comparedC) {
+			return 1;
+		} else if (this.getC() == comparedC) {
+			return 0;
+		} else {
+			return -1;
+		}
+    }
+    
     public double initialisationStep(DataLink dlj){
             double busyPeriod = c;
             //Sommation of Cj of each RCFrame on the DataLink
@@ -195,20 +208,22 @@ public class RCFrame implements Frame{
             double tooSmallGap = 0;
             //to see if there a too small gap for RC to pass. We use it for the availibility.
             if (!dlj.getTT_schedule().getFramesList().isEmpty()){
-                
                 largestC = findLargestC(dlj);
                 smallestC = findSmallestC(dlj);
-                    
                 //Time block by TT frames
                 double timeBlockByTT = 0;
                 double timeBetween2TTFrames;
                 Frame previousTTFrame=dlj.getTT_schedule().getFramesList().getFirst();
                 for(Frame frame : dlj.getTT_schedule().getFramesList()){ 
+                    //Boolean to see if the to small gap has been already computed for this TTframe. Useful for more than one too small gap in 1 busyperiod
+                    boolean tooSmallAlreadyComputed =false;
                     //Computing the time between TT.
                     if (previousTTFrame==frame)
                         timeBetween2TTFrames = Double.MAX_VALUE;
                     else
                         timeBetween2TTFrames = frame.getOffset()-(previousTTFrame.getOffset() + previousTTFrame.getC());
+                    
+                    
                     //There is 4 cases
                     //if the next TT begins before offset()+largestC //TODO
                     if(frame.getOffset()>= offset && frame.getOffset() <= offset+ largestC){
@@ -219,14 +234,18 @@ public class RCFrame implements Frame{
                         //if there is not enough time to pass a RCFrame. 
                         //Verification that there is a big enough continous availibility to pass frame.
                         double rcSatisfaction =0;
-                        for(Frame rc : dlj.getRC_schedule().getFramesList()){//TODO: Reduce complexity if possible
-                            if(!isTooSmall){
-                                if(timeBetween2TTFrames-largestC-rcSatisfaction >= rc.getC()){
+                        for(Frame rc : dlj.getRC_schedule().getSortedList()){//TODO: Reduce complexity if possible
+                            if(!tooSmallAlreadyComputed){
+                                if(timeBetween2TTFrames-largestC-rcSatisfaction >= rc.getC() && frame.getOffset()-offset-largestC-rcSatisfaction >= rc.getC()){
                                     rcSatisfaction += rc.getC();
                                 }
                                 else{
-                                    tooSmallGap += timeBetween2TTFrames-largestC - rcSatisfaction;
+                                    if(timeBetween2TTFrames < frame.getOffset()-offset)
+                                        tooSmallGap += timeBetween2TTFrames -largestC - rcSatisfaction;
+                                    else
+                                        tooSmallGap += frame.getOffset() -offset -largestC - rcSatisfaction;
                                     isTooSmall = true;
+                                    tooSmallAlreadyComputed = true;
                                 }
                             }
                         }
@@ -239,18 +258,22 @@ public class RCFrame implements Frame{
                         timeBlockByTT += frame.getOffset() + busyPeriod - (previousTTFrame.getOffset() + previousTTFrame.getC());
                     }
                     //if the TT starts outside of the time interval but has an impact in the time blocking.
-                    else if(frame.getOffset() > offset + busyPeriod && frame.getOffset()-largestC < offset+busyPeriod){
+                    else if(frame.getOffset() >= offset + busyPeriod && frame.getOffset()-largestC <= offset+busyPeriod){
                         //if there is not enough time to pass a RCFrame. 
                         //Verification that there is a big enough continous availibility to pass frame.
                         double rcSatisfaction = 0;
-                        for(Frame rc : dlj.getRC_schedule().getFramesList()){//TODO: Reduce complexity if possible
-                            if(!isTooSmall){
-                                if(timeBetween2TTFrames-largestC-rcSatisfaction >= rc.getC()){
+                        for(Frame rc : dlj.getRC_schedule().getSortedList()){//TODO: Reduce complexity if possible
+                            if(!tooSmallAlreadyComputed){
+                                if(timeBetween2TTFrames-largestC-rcSatisfaction >= rc.getC() && frame.getOffset()-offset-largestC-rcSatisfaction >= rc.getC()){
                                     rcSatisfaction += rc.getC();
                                 }
                                 else{
-                                    tooSmallGap += timeBetween2TTFrames-largestC - rcSatisfaction;
+                                    if(timeBetween2TTFrames<frame.getOffset()-offset)
+                                        tooSmallGap += timeBetween2TTFrames-largestC - rcSatisfaction;
+                                    else
+                                        tooSmallGap += frame.getOffset()-offset-largestC - rcSatisfaction;
                                     isTooSmall = true;
+                                    tooSmallAlreadyComputed = true;
                                 }
                             }
                         }
@@ -264,7 +287,6 @@ public class RCFrame implements Frame{
                         Qtb += largestC;
                     else
                         Qtb += timeBlockByTT;
-                    
                     //reinitialisation of timeBlockByTT
                     timeBlockByTT=0;
                 }
@@ -295,12 +317,10 @@ public class RCFrame implements Frame{
                 Compute demand Hxj(bpxj)
             */
             demand = computeDemand(dlj, busyPeriod);
-            //System.out.print("Demand : "+ demand +"\n");//test
             /* 
                 Compute availability Axj(bpxj)
             */
             availibility = computeAvailibility(dlj, busyPeriod);
-            //System.out.print("Availibility : "+ availibility+"\n");//test
             if(demand > availibility)
                 tj = tj+ demand - availibility;
             
@@ -309,7 +329,6 @@ public class RCFrame implements Frame{
             //Infomation
             //System.out.print("Tj : "+ tj+"\n");//test
             //System.out.print("offset : "+ offset +"\n");//test
-            //System.out.print("BusyPeriod : "+ busyPeriod +"\n\n");//test
         }while(availibility < demand);
         
         return busyPeriod;

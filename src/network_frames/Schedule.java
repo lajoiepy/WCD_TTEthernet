@@ -20,30 +20,36 @@ import java.util.*;
  *
  * @author Pierre-Yves Lajoie
  * @creationDate    October 7th 2015
- * @lastUpdate      October 13th 2015
+ * @lastUpdate      October 22th 2015
  * 
  */
 public class Schedule {
     /*Constructor*/
     
     /*Attributes*/
-    /*private class ComparatorFrame implements Comparator<Frame>{
-        @Override
-        public int compare(Frame f1, Frame f2){
-            if(f1.getOffset()<f2.getOffset())
-                return -1;
-            else if(f1.getOffset()>f2.getOffset())
-                return 1;
-            else
-                return 0;
-        }
-    }
-    ComparatorFrame cmp;
-    PriorityQueue<Frame> framesQueue = new PriorityQueue<Frame>(3,cmp);
-    */
     LinkedList<Frame> framesList = new LinkedList<Frame>();
+    LinkedList<Frame> sortedList = new LinkedList<Frame>();
     /*Methods*/
     public LinkedList<Frame> getFramesList(){
         return framesList;
+    }
+    public LinkedList<Frame> getSortedList(){
+        return sortedList;
+    }
+    
+    public void add(Frame frame){
+        framesList.add(frame);
+        sortedList.add(frame);
+        Collections.sort(sortedList, new Comparator<Frame>() {
+         @Override
+         public int compare(Frame o1, Frame o2) {
+             if (o1.getC()>o2.getC())
+                return -1;
+             else if (o1.getC()<o2.getC())
+                return 1;
+             else
+                return 0;
+         }
+        });
     }
 }

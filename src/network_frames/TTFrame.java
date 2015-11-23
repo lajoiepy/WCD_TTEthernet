@@ -23,7 +23,7 @@ package network_frames;
  * @lastUpdate      November 9th 2015
  * 
  */
-public class TTFrame implements Frame{
+public class TTFrame implements Frame, Comparable<TTFrame>{
     
     /*Constructor*/
     public TTFrame(int ID, double C, double Offset, double Rate, DataPath DP){
@@ -77,5 +77,16 @@ public class TTFrame implements Frame{
     }
     public final double getTj(){
         return t;
+    }
+    @Override
+    public int compareTo(TTFrame f) {
+		double comparedC = f.getC();
+		if (this.getC() > comparedC) {
+			return 1;
+		} else if (this.getC() == comparedC) {
+			return 0;
+		} else {
+			return -1;
+		}
     }
 }

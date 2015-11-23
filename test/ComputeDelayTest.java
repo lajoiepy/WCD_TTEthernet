@@ -63,17 +63,17 @@ public class ComputeDelayTest {
         
         //Schedule of TT frames
         TTFrame tt1 = new TTFrame(1,3,3,32);
-        dl1.getTT_schedule().getFramesList().add(tt1);
+        dl1.getTT_schedule().add(tt1);
         TTFrame tt2 = new TTFrame(2,2,9,32);
-        dl1.getTT_schedule().getFramesList().add(tt2);
+        dl1.getTT_schedule().add(tt2);
         
         TTFrame tt3 = new TTFrame(1,3,7,32);
-        dl2.getTT_schedule().getFramesList().add(tt3);
+        dl2.getTT_schedule().add(tt3);
         TTFrame tt4 = new TTFrame(3,3.5,12.5,32);
-        dl2.getTT_schedule().getFramesList().add(tt4);
+        dl2.getTT_schedule().add(tt4);
         
         TTFrame tt5 = new TTFrame(1,3,11,32);
-        dl6.getTT_schedule().getFramesList().add(tt5);
+        dl6.getTT_schedule().add(tt5);
         
         //The schedule of RC frames is empty at the beginning.
         
@@ -85,7 +85,7 @@ public class ComputeDelayTest {
         //Instance of f13 on dl2, starts at 13
         RCFrame f13 = new RCFrame(130,2,13,32,dp13);
         //TODO: Add the frame to the dataLink, Danger of infinite loop.
-        dl2.getRC_schedule().getFramesList().add(f13);
+        dl2.getRC_schedule().add(f13);
         
         //DataPath of frame 13_1
         //The DataPath is only an indication on which datalinks are concerned by the frame.
@@ -96,7 +96,7 @@ public class ComputeDelayTest {
         //Instance of f13 on dl6, starts at 23.5
         RCFrame f13_1 = new RCFrame(131,2,23.5,32,dp13_1);
         //TODO: Add the frame to the dataLink, Danger of infinite loop.
-        dl6.getRC_schedule().getFramesList().add(f13_1);
+        dl6.getRC_schedule().add(f13_1);
         
         //DataPath of frame 10
         DataPath dp14 = new DataPath();
@@ -105,7 +105,7 @@ public class ComputeDelayTest {
         //Frame 14, start at 13ms
         RCFrame f14 = new RCFrame(14,1.5,15,32,dp14);
         //TODO: Add the frame to the dataLink, Danger of infinite loop.
-        dl2.getRC_schedule().getFramesList().add(f14);
+        dl2.getRC_schedule().add(f14);
         
         
         //DataPath of frame 10
@@ -116,8 +116,8 @@ public class ComputeDelayTest {
         //Frame 10, start at 1ms
         RCFrame f10 = new RCFrame(10,1.5,1,32, dp10);
         //TODO: Add the frame to the dataLink, Danger of infinite loop.
-        dl1.getRC_schedule().getFramesList().add(f10);
-        dl2.getRC_schedule().getFramesList().add(f10);
+        dl1.getRC_schedule().add(f10);
+        dl2.getRC_schedule().add(f10);
         
         //DataPath of frame 11
         DataPath dp11 = new DataPath();
@@ -127,8 +127,8 @@ public class ComputeDelayTest {
         //Frame 10, start at 1ms
         RCFrame f11 = new RCFrame(11,2.5,1,32,dp11);
         //TODO: Add the frame to the dataLink, Danger of infinite loop.
-        dl1.getRC_schedule().getFramesList().add(f11);
-        dl2.getRC_schedule().getFramesList().add(f11);
+        dl1.getRC_schedule().add(f11);
+        dl2.getRC_schedule().add(f11);
         
         //DataPath of frame 12
         DataPath dp12 = new DataPath();
@@ -139,9 +139,9 @@ public class ComputeDelayTest {
         //Frame 12, start at 1ms
         RCFrame f12 = new RCFrame(12,2,1,32,dp12);
         //TODO: Add the frame to the dataLink, Danger of infinite loop.
-        dl1.getRC_schedule().getFramesList().add(f12);
-        dl2.getRC_schedule().getFramesList().add(f12);
-        dl6.getRC_schedule().getFramesList().add(f12);
+        dl1.getRC_schedule().add(f12);
+        dl2.getRC_schedule().add(f12);
+        dl6.getRC_schedule().add(f12);
         
         //RC queue
         LinkedList<RCFrame> RCFrameQueue = new LinkedList<RCFrame>();

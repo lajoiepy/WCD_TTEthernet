@@ -26,7 +26,7 @@ import network_components.DataLink;
  * @lastUpdate      October 7th 2015
  * 
  */
-public interface Frame {
+public interface Frame{
     public void setC(double delay);
     public double getC();
     public void setOffset(double offs);
@@ -36,5 +36,4 @@ public interface Frame {
     public DataPath getDataPath();
     public int getID();
     public double getRate();
-    
 }
