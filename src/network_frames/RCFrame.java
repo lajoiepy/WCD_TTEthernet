@@ -46,7 +46,6 @@ public class RCFrame implements Frame, Comparable<RCFrame>{
         rate=Rate;
         tj=Offset;
     }
-    
     /*Attributes*/
     private int id;
     private double tj; //last beginning of transmission time

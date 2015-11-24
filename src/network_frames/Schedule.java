@@ -27,8 +27,8 @@ public class Schedule {
     /*Constructor*/
     
     /*Attributes*/
-    LinkedList<Frame> framesList = new LinkedList<Frame>();
-    LinkedList<Frame> sortedList = new LinkedList<Frame>();
+    private LinkedList<Frame> framesList = new LinkedList<Frame>();
+    private LinkedList<Frame> sortedList = new LinkedList<Frame>();
     /*Methods*/
     public LinkedList<Frame> getFramesList(){
         return framesList;
