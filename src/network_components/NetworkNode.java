@@ -25,15 +25,15 @@ package network_components;
 public class NetworkNode {
         
     /*Constructor*/
-    public NetworkNode(String ID){
-        id = ID;
+    public NetworkNode(String id){
+        _id = id;
     }
     
     /*Attributes*/
-    private String id;
+    private String _id;
    
     /*Methods*/
     public String getID(){
-        return id;
+        return _id;
     }
 }

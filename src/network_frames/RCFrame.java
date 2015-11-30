@@ -28,69 +28,69 @@ import network_components.DataLink;
 public class RCFrame implements Frame, Comparable<RCFrame>{
         
     /*Constructors*/
-    public RCFrame(int ID, double C, double Offset, double Rate, DataPath DP){
-        id=ID;
-        c=C;
-        offset=Offset;
-        t0=Offset;
-        tj=Offset;
-        dp=DP;
-        rate=Rate;
+    public RCFrame(int id, double c, double offset, double rate, DataPath dp){
+        _id=id;
+        _c=c;
+        _offset=offset;
+        _t0=offset;
+        _tj=offset;
+        _dp=dp;
+        _rate=rate;
     }
-    public RCFrame(int ID, double C, double Offset, double Rate){
+    public RCFrame(int id, double c, double offset, double rate){
         
-        id = ID;
-        c=C;
-        offset=Offset;
-        t0=Offset;
-        rate=Rate;
-        tj=Offset;
+        _id = id;
+        _c=c;
+        _offset=offset;
+        _t0=offset;
+        _rate=rate;
+        _tj=offset;
     }
     /*Attributes*/
-    private int id;
-    private double tj; //last beginning of transmission time
-    private double c; //transimission delay
-    private double offset; //start time
-    private double t0; //initial offset
-    private double rate; //initial offset
+    private int _id;
+    private double _tj; //last beginning of transmission time
+    private double _c; //transimission delay
+    private double _offset; //start time
+    private double _t0; //initial _offset
+    private double _rate; //initial _offset
     
-    private DataPath dp = new DataPath();
+    private DataPath _dp = new DataPath();
     
     /*Methods*/
     
     public void setTj(double Tj){
-        tj=Tj;
+         _tj=Tj;
     }
     public final double getTj(){
-        return tj;
+        return  _tj;
     }
     
     public void setC(double delay){
-        c=delay;
+        _c=delay;
     }
     public final double getC(){
-        return c;
+        return _c;
     }
     public void setOffset(double offs){
-        offset=offs;
+        _offset=offs;
     }
     public final double getOffset(){
-        return offset;
+        return _offset;
     }
     public void setDataPath(DataPath d){
-        dp=d;
+        _dp=d;
     }
     public final DataPath getDataPath(){
-        return dp;
+        return _dp;
     }
     public final int getID(){
-        return id;
+        return _id;
     }
     public final double getT0(){
-        return t0;
+        return _t0;
     }
     public final double getRate(){
-        return rate;
+        return _rate;
     }
     
     @Override
@@ -106,17 +106,17 @@ public class RCFrame implements Frame, Comparable<RCFrame>{
     }
     
     public double initialisationStep(DataLink dlj){
-            double busyPeriod = c;
+            double busyPeriod = _c;
             //Sommation of Cj of each RCFrame on the DataLink
             for(Frame frame : dlj.getRC_schedule().getFramesList()){
                 if (frame!= this){ //if it is a another frame
-                    if(frame.getOffset()>=offset)//if the RC frame is after the framex
+                    if(frame.getOffset()>=_offset)//if the RC frame is after the framex
                         busyPeriod += frame.getC();
-                    else if(frame.getOffset()+frame.getC() > offset) //TODO: work since we know everything about other RC
-                        busyPeriod += frame.getOffset()+frame.getC() - offset;
+                    else if(frame.getOffset()+frame.getC() > _offset) //TODO: work since we know everything about other RC
+                        busyPeriod += frame.getOffset()+frame.getC() - _offset;
                 }
             }
-            tj=busyPeriod + offset;
+             _tj=busyPeriod + _offset;
             return busyPeriod;
     }
     
@@ -125,14 +125,14 @@ public class RCFrame implements Frame, Comparable<RCFrame>{
         double demand = 0;
         //Sommation of Cj of each RCFrame other than current frame on the DataLink and consideration of fi.rate
             for(Frame frame : dlj.getRC_schedule().getFramesList()){
-                    if((frame.getID() != id)&&(frame.getOffset()==offset))//TODO: >= or ==?
+                    if((frame.getID() != _id)&&(frame.getOffset()==_offset))//TODO: >= or ==?
                         demand += frame.getC()* Math.ceil(busyPeriod/frame.getRate());
-                    else if((frame.getID() != id)&&(frame.getOffset()+frame.getC() > offset)&&(frame.getOffset() < offset)) // work since we know everything about other RC
-                        demand += frame.getOffset()+frame.getC() - offset* Math.ceil(busyPeriod/frame.getRate());
+                    else if((frame.getID() != _id)&&(frame.getOffset()+frame.getC() > _offset)&&(frame.getOffset() < _offset)) // work since we know everything about other RC
+                        demand += frame.getOffset()+frame.getC() - _offset* Math.ceil(busyPeriod/frame.getRate());
                 
             }
             //Addition of Cxj which is equal to Cx because Cx is considered as constant
-            demand += c;
+            demand += _c;
          
          return demand;
         
@@ -141,7 +141,7 @@ public class RCFrame implements Frame, Comparable<RCFrame>{
     public double computeAvailibility(DataLink dlj, double busyPeriod){
         //Axj(bpxj)
         double availibility = 0;
-        availibility = tj;
+        availibility =  _tj;
             //Computing of Qtt
             double Qtt = computeQtt(dlj, busyPeriod);
             
@@ -163,23 +163,23 @@ public class RCFrame implements Frame, Comparable<RCFrame>{
             for(Frame frame : dlj.getTT_schedule().getFramesList()){ 
                 //There is 4 cases
                 //if the TT frame is totally between tc and tc+busyPeriod
-                if(frame.getOffset()>= offset && frame.getOffset()+frame.getC() <= offset+busyPeriod)
+                if(frame.getOffset()>= _offset && frame.getOffset()+frame.getC() <= _offset+busyPeriod)
                     Qtt += frame.getC();
                 //if the TT begins but not finish in the time interval
-                else if(frame.getOffset()>= offset && frame.getOffset() <= offset+busyPeriod && frame.getOffset() + frame.getC()>offset+busyPeriod) 
-                    Qtt += offset + busyPeriod - frame.getOffset();
+                else if(frame.getOffset()>= _offset && frame.getOffset() <= _offset+busyPeriod && frame.getOffset() + frame.getC()>_offset+busyPeriod) 
+                    Qtt += _offset + busyPeriod - frame.getOffset();
                 //if the TT starts before the time interval and finish during it.
-                else if(frame.getOffset() < offset && frame.getOffset()+frame.getC() <= offset+busyPeriod && frame.getOffset()+frame.getC() > offset) 
-                    Qtt += frame.getOffset() + frame.getC() - offset;
+                else if(frame.getOffset() < _offset && frame.getOffset()+frame.getC() <= _offset+busyPeriod && frame.getOffset()+frame.getC() > _offset) 
+                    Qtt += frame.getOffset() + frame.getC() - _offset;
                 //if the TT covers totally the time interval.
-                else if(frame.getOffset() < offset && frame.getOffset()+frame.getC() > offset+busyPeriod)  
+                else if(frame.getOffset() < _offset && frame.getOffset()+frame.getC() > _offset+busyPeriod)  
                     Qtt += busyPeriod;
             }
         return Qtt;
     }
     
     public double findLargestC(DataLink dlj){ //TODO: merge find the largest and the smallest
-        double largestC = c;
+        double largestC = _c;
         //find the largestC 
                 for(Frame frame : dlj.getRC_schedule().getFramesList()){
                         if(frame.getC() > largestC)
@@ -189,7 +189,7 @@ public class RCFrame implements Frame, Comparable<RCFrame>{
     }
     
     public double findSmallestC(DataLink dlj){
-        double smallestC = c;
+        double smallestC = _c;
         //find the smallestC
                 for(Frame frame : dlj.getRC_schedule().getFramesList()){
                         if(frame.getC() < smallestC)
@@ -224,25 +224,25 @@ public class RCFrame implements Frame, Comparable<RCFrame>{
                     
                     
                     //There is 4 cases
-                    //if the next TT begins before offset()+largestC //TODO
-                    if(frame.getOffset()>= offset && frame.getOffset() <= offset+ largestC){
-                        timeBlockByTT += frame.getOffset()-offset;
+                    //if the next TT begins before _offset()+largestC //TODO
+                    if(frame.getOffset()>= _offset && frame.getOffset() <= _offset+ largestC){
+                        timeBlockByTT += frame.getOffset()-_offset;
                     }
                     //if the time block is totally between tc and tc+busyPeriod and is smaller than the gap between the 2 TT frames
-                    else if(frame.getOffset()>= offset+largestC && frame.getOffset()<= offset+busyPeriod && largestC<= timeBetween2TTFrames){
+                    else if(frame.getOffset()>= _offset+largestC && frame.getOffset()<= _offset+busyPeriod && largestC<= timeBetween2TTFrames){
                         //if there is not enough time to pass a RCFrame. 
                         //Verification that there is a big enough continous availibility to pass frame.
                         double rcSatisfaction =0;
                         for(Frame rc : dlj.getRC_schedule().getSortedList()){//TODO: Reduce complexity if possible
                             if(!tooSmallAlreadyComputed){
-                                if(timeBetween2TTFrames-largestC-rcSatisfaction >= rc.getC() && frame.getOffset()-offset-largestC-rcSatisfaction >= rc.getC()){
+                                if(timeBetween2TTFrames-largestC-rcSatisfaction >= rc.getC() && frame.getOffset()-_offset-largestC-rcSatisfaction >= rc.getC()){
                                     rcSatisfaction += rc.getC();
                                 }
                                 else{
-                                    if(timeBetween2TTFrames < frame.getOffset()-offset)
+                                    if(timeBetween2TTFrames < frame.getOffset()-_offset)
                                         tooSmallGap += timeBetween2TTFrames -largestC - rcSatisfaction;
                                     else
-                                        tooSmallGap += frame.getOffset() -offset -largestC - rcSatisfaction;
+                                        tooSmallGap += frame.getOffset() -_offset -largestC - rcSatisfaction;
                                     isTooSmall = true;
                                     tooSmallAlreadyComputed = true;
                                 }
@@ -251,32 +251,32 @@ public class RCFrame implements Frame, Comparable<RCFrame>{
                         timeBlockByTT += largestC;
                     }
                     //if the TT starts after the time interval and the previous TT starts in the interval but finish after frame.offset()-largestC.
-                    else if(frame.getOffset() >= offset + busyPeriod && previousTTFrame.getOffset() >= offset
-                            && previousTTFrame.getOffset() + previousTTFrame.getC() <= offset+busyPeriod 
+                    else if(frame.getOffset() >= _offset + busyPeriod && previousTTFrame.getOffset() >= _offset
+                            && previousTTFrame.getOffset() + previousTTFrame.getC() <= _offset+busyPeriod 
                             && previousTTFrame.getOffset() + previousTTFrame.getC() >= frame.getOffset()-largestC ) {
                         timeBlockByTT += frame.getOffset() + busyPeriod - (previousTTFrame.getOffset() + previousTTFrame.getC());
                     }
                     //if the TT starts outside of the time interval but has an impact in the time blocking.
-                    else if(frame.getOffset() >= offset + busyPeriod && frame.getOffset()-largestC <= offset+busyPeriod){
+                    else if(frame.getOffset() >= _offset + busyPeriod && frame.getOffset()-largestC <= _offset+busyPeriod){
                         //if there is not enough time to pass a RCFrame. 
                         //Verification that there is a big enough continous availibility to pass frame.
                         double rcSatisfaction = 0;
                         for(Frame rc : dlj.getRC_schedule().getSortedList()){//TODO: Reduce complexity if possible
                             if(!tooSmallAlreadyComputed){
-                                if(timeBetween2TTFrames-largestC-rcSatisfaction >= rc.getC() && frame.getOffset()-offset-largestC-rcSatisfaction >= rc.getC()){
+                                if(timeBetween2TTFrames-largestC-rcSatisfaction >= rc.getC() && frame.getOffset()-_offset-largestC-rcSatisfaction >= rc.getC()){
                                     rcSatisfaction += rc.getC();
                                 }
                                 else{
-                                    if(timeBetween2TTFrames<frame.getOffset()-offset)
+                                    if(timeBetween2TTFrames<frame.getOffset()-_offset)
                                         tooSmallGap += timeBetween2TTFrames-largestC - rcSatisfaction;
                                     else
-                                        tooSmallGap += frame.getOffset()-offset-largestC - rcSatisfaction;
+                                        tooSmallGap += frame.getOffset()-_offset-largestC - rcSatisfaction;
                                     isTooSmall = true;
                                     tooSmallAlreadyComputed = true;
                                 }
                             }
                         }
-                        timeBlockByTT += offset+busyPeriod - (frame.getOffset()-largestC);
+                        timeBlockByTT += _offset+busyPeriod - (frame.getOffset()-largestC);
                     }
                     //Saving the TTframe
                     previousTTFrame=frame;
@@ -321,13 +321,13 @@ public class RCFrame implements Frame, Comparable<RCFrame>{
             */
             availibility = computeAvailibility(dlj, busyPeriod);
             if(demand > availibility)
-                tj = tj+ demand - availibility;
+                 _tj =  _tj+ demand - availibility;
             
             //Update the busyPeriod
-            busyPeriod = tj - offset;
+            busyPeriod =  _tj - _offset;
             //Infomation
-            //System.out.print("Tj : "+ tj+"\n");//test
-            //System.out.print("offset : "+ offset +"\n");//test
+            //System.out.print("Tj : "+  _tj+"\n");//test
+            //System.out.print("offset : "+ _offset +"\n");//test
         }while(availibility < demand);
         
         return busyPeriod;
@@ -337,24 +337,24 @@ public class RCFrame implements Frame, Comparable<RCFrame>{
         double busyPeriod = 0;
         double delay = 0;
             //System.out.print("Frame "+id+" : "); //test
-            for(DataLink dlj: dp.getDataLinksQueue()){
+            for(DataLink dlj: _dp.getDataLinksQueue()){
                 
                 /*
-                * Time Issue: We can't go back in time so the offset of current frame is bigger or equal to the Tj of the previous 
+                * Time Issue: We can't go back in time so the _offset of current frame is bigger or equal to the Tj of the previous 
                 */
                 for(Frame frameRC : dlj.getRC_schedule().getFramesList()){
                     if (frameRC == this)
                         break;
-                    if(offset < tj){
-                        offset = tj;
-                        tj= tj + c;
+                    if(_offset <  _tj){
+                        _offset =  _tj;
+                         _tj=  _tj + _c;
                     }
                 }
                 //Verification that the frame does not start during a TT frame
                 for(Frame frameTT : dlj.getTT_schedule().getFramesList()){
-                    if(offset > frameTT.getOffset() && offset < frameTT.getTj()){
-                        offset = frameTT.getTj();
-                        tj = frameTT.getTj()+ c;
+                    if(_offset > frameTT.getOffset() && _offset < frameTT.getTj()){
+                        _offset = frameTT.getTj();
+                         _tj = frameTT.getTj()+ _c;
                     }
                 }
                 
@@ -362,27 +362,27 @@ public class RCFrame implements Frame, Comparable<RCFrame>{
                 //computing of busyPeriod
                 busyPeriod = computeBusyPeriod(dlj);
                 //computing of tn
-                tj= offset + busyPeriod;
+                 _tj= _offset + busyPeriod;
                 
                 //updating of tc
-                offset = offset + busyPeriod - c;
+                _offset = _offset + busyPeriod - _c;
 
                 //info
                 /*System.out.print(offset);//test
                 System.out.print("|--");//test
                 System.out.print(dlj.getID()); //test
                 System.out.print("--|");//test
-                System.out.print(tj+"       ");//test*/
+                System.out.print( _tj+"       ");//test*/
                 //System.out.print("BP: "+busyPeriod+"   "); //test
                 
             }
             //System.out.print("\n\n");//test
             
-            delay = tj-t0;
+            delay =  _tj-_t0;
             
-            //Reset offset and t of frame
-            offset = t0;
-            tj = t0;
+            //Reset _offset and t of frame
+            _offset = _t0;
+             _tj = _t0;
         return delay;
     }
     

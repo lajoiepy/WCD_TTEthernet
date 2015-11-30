@@ -26,29 +26,29 @@ import network_frames.*;
 public class DataLink {
         
     /*Constructor*/
-    public DataLink(NetworkNode Node1, NetworkNode Node2, int ID){
-        node1 = Node1;
-        node2 = Node2;
-        id=ID;
+    public DataLink(NetworkNode node1, NetworkNode node2, int id){
+        _node1 = node1;
+        _node2 = node2;
+        _id=id;
     }
     
     /*Attributes*/
-    private int id;
-    private NetworkNode node1;
-    private NetworkNode node2;
-    private Schedule RC_schedule = new Schedule();
-    private Schedule TT_schedule = new Schedule();
+    private int _id;
+    private NetworkNode _node1;
+    private NetworkNode _node2;
+    private Schedule _RC_schedule = new Schedule();
+    private Schedule _TT_schedule = new Schedule();
     /*Methods*/
     public final int getID(){
-        return id;
+        return _id;
     }
     public final Schedule getRC_schedule(){
-        return RC_schedule;
+        return _RC_schedule;
     }
     public final Schedule getTT_schedule(){
-        return TT_schedule;
+        return _TT_schedule;
     }
     public boolean compare(DataLink dl){
-        return dl.node1==node1 && dl.node2==node2;
+        return dl._node1==_node1 && dl._node2==_node2;
     }
 }

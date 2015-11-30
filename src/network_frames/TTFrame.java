@@ -26,57 +26,57 @@ package network_frames;
 public class TTFrame implements Frame, Comparable<TTFrame>{
     
     /*Constructor*/
-    public TTFrame(int ID, double C, double Offset, double Rate, DataPath DP){
-        c=C;
-        offset=Offset;
-        dp=DP;
-        id = ID;
-        rate=Rate;
-        t=Offset+C;
+    public TTFrame(int id, double c, double offset, double rate, DataPath dp){
+        _c=c;
+        _offset=offset;
+        _dp=dp;
+        _id = id;
+        _rate=rate;
+        _t=offset+c;
     }
-    public TTFrame(int ID, double C, double Offset, double Rate){
-        id = ID;
-        c=C;
-        offset=Offset;
-        rate=Rate;
-        t=Offset+C;
+    public TTFrame(int id, double c, double offset, double rate){
+        _id = id;
+        _c=c;
+        _offset=offset;
+        _rate=rate;
+        _t=offset+c;
     }
     /*Attributes*/
-    private int id;
-    private double c; //transimission delay
-    private double offset; //start time
-    private double rate;
-    private double t;
+    private int _id;
+    private double _c; //transimission delay
+    private double _offset; //start time
+    private double _rate;
+    private double _t;
     
-    private DataPath dp = new DataPath();
+    private DataPath _dp = new DataPath();
     
     /*Methods*/
     public void setC(double delay){
-        c=delay;
+        _c=delay;
     }
     public final double getC(){
-        return c;
+        return _c;
     }
     public void setOffset(double offs){
-        offset=offs;
+        _offset=offs;
     }
     public final double getOffset(){
-        return offset;
+        return _offset;
     }
     public void setDataPath(DataPath d){
-        dp=d;
+        _dp=d;
     }
     public final DataPath getDataPath(){
-        return dp;
+        return _dp;
     }
     public final int getID(){
-        return id;
+        return _id;
     }
     public final double getRate(){
-        return rate;
+        return _rate;
     }
     public final double getTj(){
-        return t;
+        return _t;
     }
     @Override
     public int compareTo(TTFrame f) {

@@ -29,10 +29,10 @@ public class DataPath {
     /*Constructor*/
     
     /*Attributes*/
-    private LinkedList<DataLink> path = new LinkedList<DataLink>();
+    private LinkedList<DataLink> _path = new LinkedList<DataLink>();
     
     /*Methods*/
     public final LinkedList<DataLink> getDataLinksQueue(){
-        return path;
+        return _path;
     }
 }

@@ -27,20 +27,20 @@ public class Schedule {
     /*Constructor*/
     
     /*Attributes*/
-    private LinkedList<Frame> framesList = new LinkedList<Frame>();
-    private LinkedList<Frame> sortedList = new LinkedList<Frame>();
+    private LinkedList<Frame> _framesList = new LinkedList<Frame>();
+    private LinkedList<Frame> _sortedList = new LinkedList<Frame>();
     /*Methods*/
     public LinkedList<Frame> getFramesList(){
-        return framesList;
+        return _framesList;
     }
     public LinkedList<Frame> getSortedList(){
-        return sortedList;
+        return _sortedList;
     }
     
     public void add(Frame frame){
-        framesList.add(frame);
-        sortedList.add(frame);
-        Collections.sort(sortedList, new Comparator<Frame>() {
+        _framesList.add(frame);
+        _sortedList.add(frame);
+        Collections.sort(_sortedList, new Comparator<Frame>() {
          @Override
          public int compare(Frame o1, Frame o2) {
              if (o1.getC()>o2.getC())
